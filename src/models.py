@@ -166,10 +166,12 @@ class Planets(db.Model):
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     favorites_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    people_uid = db.Column(db.Integer, db.ForeignKey('people.uid'))
-    vehicles_uid = db.Column(db.Integer, db.ForeignKey('vehicles.uid'))
-    planets_uid = db.Column(db.Integer, db.ForeignKey('planets.uid'))
-    user_uid = db.Column(db.Integer, db.ForeignKey('user.id'))    
+    people_uid = db.Column(db.Integer, db.ForeignKey('people.uid'), nullable=True)
+    vehicles_uid = db.Column(db.Integer, db.ForeignKey('vehicles.uid'), nullable=True)
+    planets_uid = db.Column(db.Integer, db.ForeignKey('planets.uid'), nullable=True)
+    user_uid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+  
     
     def serialize(self):
         return{
@@ -178,8 +180,9 @@ class Favorites(db.Model):
             "vehicles_uid": self.vehicles_uid,
             "planets_uid": self.planets_uid,
             "user_uid": self.user,
-            
-
+            #"people": {'name': self.people.name },
+            #"vehicles": {'name': self.vehicles.name },
+            #"planets": {'name': self.planets.name }
         }
 
 
@@ -196,6 +199,5 @@ class People_drive_vehicle(db.Model):
             "people_drive_vehicles_id": self.people_drive_vehicles_id,
             "people_uid": self.people_uid,
             "vehicles_uid": self.vehicles_uid,
-            "vehicles": self.vehicles,
-            
+            "vehicles": self.vehicles            
         }

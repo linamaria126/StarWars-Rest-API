@@ -110,6 +110,57 @@ def get_vehicle_uid(vehicle_uid):
     return jsonify({"vehicle": vehicle.serialize()})
 
 
+#Ruta para crear un favorito de la lista de people, con el people_id.
+@app.route('/favorite/people/<int:people_uid>', methods=['POST'])
+def post_people_uid(people_uid):
+
+    try: 
+        body = request.json
+        
+        user_uid = body.get('user_uid', None )
+        new_people_favorite = Favorites(people_uid = people_uid, user_uid = user_uid)
+        db.session.add(new_people_favorite)
+        db.session.commit()
+        return jsonify({"msg":"People Favorite created", "id": new_people_favorite.favorites_id }), 201
+    except Exception as error:
+        db.session.rollback()
+        print(error)
+        return jsonify('There is a problem'), 500
+    
+#Ruta para crear un favorito de la lista de planets, con el people_id.
+@app.route('/favorite/planet/<int:planet_uid>', methods=['POST'])
+def post_planet_uid(planet_uid):
+
+    try: 
+        body = request.json
+        
+        user_uid = body.get('user_uid', None )
+        new_planet_favorite = Favorites(planet_uid = planet_uid, user_uid = user_uid)
+        db.session.add(new_planet_favorite)
+        db.session.commit()
+        return jsonify({"msg":"Planet Favorite created", "id": new_planet_favorite.favorites_id }), 201
+    except Exception as error:
+        db.session.rollback()
+        print(error)
+        return jsonify('There is a problem'), 500
+    
+
+    
+@app.route('/favorite/<int:user_uid>', methods=['GET'])
+def get_favorite_byUser(user_uid):
+
+    favorites = Favorites.query.filter_by(user_uid=user_uid)
+    serialized_favorites = [favorite.serialize() for favorite in favorites]
+     
+
+    
+    return jsonify({'results': serialized_favorites}), 200
+
+
+
+
+
+
 # this only runs if `$ python src/app.py` is executed
 
 if __name__ == '__main__':
