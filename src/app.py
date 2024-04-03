@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planets, Vehicles, Favorites, People_drive_vehicle
+from models import db, User, People, Planets, Vehicles, Favorites
 #from models import Person
 
 app = Flask(__name__)
@@ -114,38 +114,42 @@ def get_vehicle_uid(vehicle_uid):
 @app.route('/favorite/people/<int:people_uid>', methods=['POST'])
 def post_people_uid(people_uid):
 
-    try: 
-        body = request.json
-        
-        user_uid = body.get('user_uid', None )
-        new_people_favorite = Favorites(people_uid = people_uid, user_uid = user_uid)
-        db.session.add(new_people_favorite)
+    body = request.json
+    user_uid = body.get('user_uid', None )
+    
+    new_people_favorite = Favorites(people_uid = people_uid, user_uid = user_uid)
+    db.session.add(new_people_favorite)
+    try:     
+                 
         db.session.commit()
         return jsonify({"msg":"People Favorite created", "id": new_people_favorite.favorites_id }), 201
+    
     except Exception as error:
         db.session.rollback()
         print(error)
-        return jsonify('There is a problem'), 500
+        return jsonify({"error":str(error)}), 500
     
-#Ruta para crear un favorito de la lista de planets, con el people_id.
+#Ruta para crear un favorito de la lista de planets, con el planet_id.
 @app.route('/favorite/planet/<int:planet_uid>', methods=['POST'])
 def post_planet_uid(planet_uid):
 
-    try: 
-        body = request.json
+    body = request.json
         
-        user_uid = body.get('user_uid', None )
-        new_planet_favorite = Favorites(planet_uid = planet_uid, user_uid = user_uid)
-        db.session.add(new_planet_favorite)
+    user_uid = body.get('user_uid', None )
+    new_planet_favorite = Favorites(planet_uid = planet_uid, user_uid = user_uid)
+    db.session.add(new_planet_favorite)
+
+    try:
         db.session.commit()
         return jsonify({"msg":"Planet Favorite created", "id": new_planet_favorite.favorites_id }), 201
+    
     except Exception as error:
         db.session.rollback()
         print(error)
         return jsonify('There is a problem'), 500
     
 
-    
+# Ruta para mostrar todos los favoritos de un usuario  
 @app.route('/favorite/<int:user_uid>', methods=['GET'])
 def get_favorite_byUser(user_uid):
 
@@ -153,9 +157,28 @@ def get_favorite_byUser(user_uid):
     serialized_favorites = [favorite.serialize() for favorite in favorites]
      
 
-    
+    print(serialized_favorites)
     return jsonify({'results': serialized_favorites}), 200
 
+
+#Ruta para borrar un 'people' favorito
+@app.route('/favorite/people/<int:people_uid>', methods=['DELETE'])
+def delete_people_uid(people_uid):
+
+    body = request.json
+    user_uid = body.get('user_uid', None )
+    
+    delete_people_favorite = Favorites(people_uid = people_uid, user_uid = user_uid)
+    db.session.delete(delete_people_favorite)
+    try:     
+                 
+        db.session.commit()
+        return jsonify({"msg":"Favorite deleted", "id": delete_people_favorite.favorites_id }), 201
+    
+    except Exception as error:
+        db.session.rollback()
+        print(error)
+        return jsonify({"error":str(error)}), 500
 
 
 
