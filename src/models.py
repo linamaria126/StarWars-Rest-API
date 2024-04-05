@@ -155,7 +155,7 @@ class Favorites(db.Model):
     people_uid = db.Column(db.Integer, db.ForeignKey('people.uid'), nullable=True)
     vehicles_uid = db.Column(db.Integer, db.ForeignKey('vehicles.uid'), nullable=True)
     planets_uid = db.Column(db.Integer, db.ForeignKey('planets.uid'), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     def __repr__(self):
         return '<Favorites %r>' % self.id

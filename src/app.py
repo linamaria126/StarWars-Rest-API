@@ -136,12 +136,12 @@ def post_planet_uid(planet_uid):
     body = request.json
         
     user_uid = body.get('user_uid', None )
-    new_planet_favorite = Favorites(planet_uid = planet_uid, user_uid = user_uid)
+    new_planet_favorite = Favorites(planets_uid = planet_uid, user_id = user_uid)
     db.session.add(new_planet_favorite)
 
     try:
         db.session.commit()
-        return jsonify({"msg":"Planet Favorite created", "id": new_planet_favorite.favorites_id }), 201
+        return jsonify({"msg":"Planet Favorite created", "id": new_planet_favorite.id }), 201
     
     except Exception as error:
         db.session.rollback()
@@ -160,20 +160,22 @@ def get_favorite_byUser(user_uid):
     print(serialized_favorites)
     return jsonify({'results': serialized_favorites}), 200
 
-# Ruta para mostrar todos los favoritos 
+# Ruta para mostrar todos los favoritos de people con su respectivo nombre
 @app.route('/favorite', methods=['GET'])
 def get_favorite():
 
     #favorites = Favorites.query.all()
     #favorites = db.session.query(Favorites, People, Planets, User).join(People,Favorites.people_uid==People.uid).join(Planets,Favorites.planets_uid==Planets.uid).join(User, Favorites.user_id==User.id).all()
     #serialized_favorites = [favorite.serialize() for favorite in favorites]
-    favorites = db.session.query(Favorites, People,Planets).join(People, Favorites.people_uid==People.uid).join(Planets, Favorites.planets_uid==Planets.uid).all()
+    #favorites = db.session.query(Favorites, People,Planets).join(People, Favorites.people_uid==People.uid).join(Planets, Favorites.planets_uid==Planets.uid).all()
+    favorites = db.session.query(Favorites, People).join(People, Favorites.people_uid==People.uid).all()
     serialized_favorites = list(map(lambda fav:{
         "idfavorito": fav[0].id,
         "idpeople": fav[1].uid,
         "namepeople": fav[1].name,
-        "idplanets": fav[2].uid,
-        "nameplanets": fav[2].name,
+        #"user_id": fav[2].user_id,
+        #"idplanets": fav[2].uid,
+        #"nameplanets": fav[2].name,
     }, favorites))
      
 
@@ -188,12 +190,12 @@ def delete_people_uid(people_uid):
     body = request.json
     user_uid = body.get('user_uid', None )
     
-    delete_people_favorite = Favorites(people_uid = people_uid, user_uid = user_uid)
+    delete_people_favorite = Favorites.query.filter_by(people_uid = people_uid, user_id = user_uid).one_or_none()
     db.session.delete(delete_people_favorite)
     try:     
                  
         db.session.commit()
-        return jsonify({"msg":"Favorite deleted", "id": delete_people_favorite.favorites_id }), 201
+        return jsonify({"msg":"Favorite deleted", "id": delete_people_favorite.id}), 201
     
     except Exception as error:
         db.session.rollback()
@@ -201,7 +203,24 @@ def delete_people_uid(people_uid):
         return jsonify({"error":str(error)}), 500
 
 
+#Ruta para borrar un 'planet' favorito
+@app.route('/favorite/planet/<int:planet_uid>', methods=['DELETE'])
+def delete_planet_uid(planet_uid):
 
+    body = request.json
+    user_uid = body.get('user_uid', None )
+    
+    delete_planet_favorite = Favorites.query.filter_by(planets_uid = planet_uid, user_id = user_uid).first()
+    db.session.delete(delete_planet_favorite)
+    try:     
+                 
+        db.session.commit()
+        return jsonify({"msg":"Favorite deleted", "id": delete_planet_favorite.id}), 201
+    
+    except Exception as error:
+        db.session.rollback()
+        print(error)
+        return jsonify({"error":str(error)}), 500
 
 
 # this only runs if `$ python src/app.py` is executed
