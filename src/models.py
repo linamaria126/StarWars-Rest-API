@@ -162,12 +162,14 @@ class Favorites(db.Model):
     
 
     def serialize(self):
-        people = db.query.get(self.people_uid)
+        #people = db.query.get(self.people_uid)
         return{
             "id": self.id,
-            "people_name": people.serialize()['name'],
+            #"people_name": people.serialize()['name'],
             "vehicles_uid": self.vehicles_uid,
             "planets_uid": self.planets_uid,
+            "user_id": self.user_id,
+            "people_uid": self.people_uid
             
         }
 
