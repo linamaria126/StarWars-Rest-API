@@ -162,16 +162,28 @@ class Favorites(db.Model):
     
 
     def serialize(self):
-        #people = db.query.get(self.people_uid)
-        return{
+        
+        favorite = {
             "id": self.id,
-            #"people_name": people.serialize()['name'],
+            "people_uid": self.people_uid,
+            "people_name": None,
             "vehicles_uid": self.vehicles_uid,
+            "vehicles_name": None,
             "planets_uid": self.planets_uid,
-            "user_id": self.user_id,
-            "people_uid": self.people_uid
-            
+            "planets_name": None,
+            "user_id": self.user_id
         }
+
+        if self.people:
+            favorite["people_name"] = self.people.name
+
+        if self.planets:
+            favorite["planet_name"] = self.planets.name
+
+        if self.vehicles:
+            favorite["vehicles_name"] = self.vehicles.name
+
+        return favorite
 
 
 class People_drive_vehicle(db.Model):

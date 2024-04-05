@@ -153,7 +153,7 @@ def post_planet_uid(planet_uid):
 @app.route('/favorite/<int:user_uid>', methods=['GET'])
 def get_favorite_byUser(user_uid):
 
-    favorites = Favorites.query.filter_by(user_uid=user_uid)
+    favorites = Favorites.query.filter_by(user_id=user_uid)
     serialized_favorites = [favorite.serialize() for favorite in favorites]
      
 
@@ -164,23 +164,30 @@ def get_favorite_byUser(user_uid):
 @app.route('/favorite', methods=['GET'])
 def get_favorite():
 
-    #favorites = Favorites.query.all()
+
+
+    favorites = Favorites.query.all()
+    serialized_favorites = [favorite.serialize() for favorite in favorites]
+
+    response_body =  { "results": serialized_favorites }
+
+    return jsonify(response_body), 200
+
     #favorites = db.session.query(Favorites, People, Planets, User).join(People,Favorites.people_uid==People.uid).join(Planets,Favorites.planets_uid==Planets.uid).join(User, Favorites.user_id==User.id).all()
-    #serialized_favorites = [favorite.serialize() for favorite in favorites]
     #favorites = db.session.query(Favorites, People,Planets).join(People, Favorites.people_uid==People.uid).join(Planets, Favorites.planets_uid==Planets.uid).all()
-    favorites = db.session.query(Favorites, People).join(People, Favorites.people_uid==People.uid).all()
-    serialized_favorites = list(map(lambda fav:{
-        "idfavorito": fav[0].id,
-        "idpeople": fav[1].uid,
-        "namepeople": fav[1].name,
+    #favorites = db.session.query(Favorites, People).join(People, Favorites.people_uid==People.uid).all()
+    #serialized_favorites = list(map(lambda fav:{
+        #"idfavorito": fav[0].id,
+        #"idpeople": fav[1].uid,
+        #"namepeople": fav[1].name,
         #"user_id": fav[2].user_id,
         #"idplanets": fav[2].uid,
         #"nameplanets": fav[2].name,
-    }, favorites))
+    #}, favorites))
      
 
-    print(serialized_favorites)
-    return jsonify({'results': serialized_favorites}), 200
+    #print(serialized_favorites)
+    #return jsonify({'results': serialized_favorites}), 200
 
 
 #Ruta para borrar un 'people' favorito
